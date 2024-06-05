@@ -1,6 +1,5 @@
 from cat.mad_hatter.decorators import hook, tool
 from cat.plugins.CC_plugin_foglietti_illustrativi.functions import *
-import json
 
 
 @hook
@@ -10,48 +9,15 @@ def agent_prompt_prefix(prefix, cat):
     Sei un farmacista, e rispondi in modo professionale.
     Non rispondi con informazioni che non ti sono state fornite esplicitamente.
     Non rispondi a domande inappropriate.
+    Ad ogni domanda rispondi nel modo più completo e preciso possibile.
     """
 
     return prefix
 
 
-filenames = []
-filename_ids = {}
-
-
-@hook
-def before_rabbithole_insert_memory(doc, cat):
-    global filenames
-    global filename_ids
-
-    if doc.metadata["source"] not in filenames:
-        # doc.page_content
-        name_f_string = (
-            str(
-                cat.llm(
-                    f"""Rispondi SOLAMENTE con un file json formattato in questo modo:
-                {{"name": qua scrivi il nome del farmaco indicato, solo il nome, senza indicare a cosa serve}}
-
-                Dati : {doc.page_content}
-        """
-                )
-            )
-            .replace("```json", "")
-            .replace("```", "")
-        )
-        name_f = json.loads(name_f_string)["name"]
-
-        filenames.append(doc.metadata["source"])
-        filename_ids.update({doc.metadata["source"]: name_f})
-
-    doc.metadata["name"] = filename_ids[doc.metadata["source"]]
-
-    return doc
-
-
 @hook
 def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
-    medicine = "Tachipirina"
+    medicine = "fi_abilify_1mg_sol.txt"
     # history = cat.working_memory.history
     # max_index = len(history) - 1
     # index_now = max_index
@@ -63,7 +29,7 @@ def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
     #     if index_now < 0:
     #         medicine = ""
 
-    declarative_recall_config["metadata"] = {"name": medicine}
+    declarative_recall_config["metadata"] = {"source": medicine}
 
     return declarative_recall_config
 
