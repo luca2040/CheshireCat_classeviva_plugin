@@ -12,7 +12,7 @@ def names_from_metadata(cat: CheshireCat) -> List[str]:
     # Record -> id; payload={page_content; metadata}; vector
 
     for point in points:
-        metadata_name = point.payload["metadata"]["name"]
+        metadata_name = point.payload["metadata"]["source"]
 
         if metadata_name not in name_list:
             name_list.append(metadata_name)
